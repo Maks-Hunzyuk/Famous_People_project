@@ -12,17 +12,35 @@ data_db = [
     {'id': 3, 'title': 'Джулия Роббертс', 'content': 'Биография Джулии Роббертс', 'is_published': True}
 ]
 
+categories_db = [
+    {'id': 1, 'name': 'Актрисы'},
+    {'id': 2, 'name': 'Актеры'},
+    {'id': 3, 'name': 'Спортсмены'},
+    {'id': 4, 'name': 'Спортсменки'},
+]
+
 def index(request):
     context = {
                'menu': menu,
                'title': 'Главная страница',
                'posts': data_db,
-               'url_name': url_name
+               'url_name': url_name,
+               'category_selected': 0
                }
     return render(request, 'people/index.html', context)
 
 def show_post(request, post_id):
     return HttpResponse(f'Отображение статьи с id {post_id}')
+
+def show_category(request, category_id):
+    context = {
+        'title': 'Отображние по категориям',
+        'menu': menu,
+        'posts': data_db,
+        'category_selected': category_id
+    }
+
+    return render(request, 'people/index.html', context)
 
 def add_page(request):
     return HttpResponse('Добавление статьи')
