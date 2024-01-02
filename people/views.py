@@ -13,30 +13,8 @@ menu = [
 url_name = ["about", "add_page", "contact", "login"]
 
 
-data_db = [
-    {
-        "id": 1,
-        "title": "Аднжелина Джоли",
-        "content": "Биография Анджелины Джоли",
-        "is_published": True,
-    },
-    {
-        "id": 2,
-        "title": "Марго Робби",
-        "content": "Биография Марго Робби",
-        "is_published": False,
-    },
-    {
-        "id": 3,
-        "title": "Джулия Роббертс",
-        "content": "Биография Джулии Роббертс",
-        "is_published": True,
-    },
-]
-
-
 def index(request):
-    posts = People.published.all()
+    posts = People.published.all().select_related('category')
     context = {
         "menu": menu,
         "title": "Главная страница",
@@ -56,7 +34,7 @@ def show_post(request, post_slug):
 
 def show_category(request, category_slug):
     category = get_object_or_404(Categories, slug=category_slug)
-    posts = People.published.filter(category_id=category.pk)
+    posts = People.published.filter(category_id=category.pk).select_related('category')
     context = {
         "title": f"Рубрика: {category.name}",
         "menu": menu,
@@ -90,7 +68,7 @@ def about(request):
 
 def  show_tag_post_list(request, tag_slug):
     tag = get_object_or_404(TagPost, slug=tag_slug)
-    posts = tag.tags.filter(is_published=People.Status.PUBLISHED)
+    posts = tag.tags.filter(is_published=People.Status.PUBLISHED).select_related('category')
 
     context = {
         'title': f"Тег: #{tag.tag}",

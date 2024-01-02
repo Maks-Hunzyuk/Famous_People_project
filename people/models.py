@@ -17,10 +17,19 @@ class People(models.Model):
     content = models.TextField(blank=True)
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(choices=Status.choices, default=Status.DRAFT)
-    category = models.ForeignKey('Categories', on_delete=models.PROTECT, related_name='posts')
-    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags')
-    partner = models.OneToOneField('Partner', on_delete=models.SET_NULL, null=True, blank=True, related_name='partner')
+    is_published = models.BooleanField(choices=tuple(map(
+        lambda x: (bool(x[0]), x[1]), Status.choices)), default=Status.DRAFT)
+    category = models.ForeignKey(
+        "Categories", on_delete=models.PROTECT, related_name="posts"
+    )
+    tags = models.ManyToManyField("TagPost", blank=True, related_name="tags")
+    partner = models.OneToOneField(
+        "Partner",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="partner",
+    )
 
     objects = models.Manager()
     published = PublishedManager()
@@ -29,6 +38,8 @@ class People(models.Model):
         return self.title
 
     class Meta:
+        verbose_name = "Известные люди"
+        verbose_name_plural = "Известные люди"
         ordering = ("-time_create",)
         indexes = [models.Index(fields=("-time_create",))]
 
@@ -36,6 +47,10 @@ class People(models.Model):
 class Categories(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
     def __str__(self) -> str:
         return self.name
@@ -45,7 +60,7 @@ class TagPost(models.Model):
     tag = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=255, db_index=True, unique=True)
 
-    def  __str__(self) -> str:
+    def __str__(self) -> str:
         return self.tag
 
 
