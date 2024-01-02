@@ -16,5 +16,5 @@ urlpatterns = [
     path('addpage/', add_page, name='add_page'),
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
-    path('category/<int:category_id>/', show_category, name='category')
+    path('category/<slug:category_slug>/', show_category, name='category')
 ]

@@ -1,7 +1,7 @@
 from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
-from people.models import People
+from people.models import People, Categories
 
 
 menu = [
@@ -34,13 +34,6 @@ data_db = [
     },
 ]
 
-categories_db = [
-    {"id": 1, "name": "Актрисы"},
-    {"id": 2, "name": "Актеры"},
-    {"id": 3, "name": "Спортсмены"},
-    {"id": 4, "name": "Спортсменки"},
-]
-
 
 def index(request):
     posts = People.published.all()
@@ -61,12 +54,14 @@ def show_post(request, post_slug):
     return render(request, "people/post.html", context)
 
 
-def show_category(request, category_id):
+def show_category(request, category_slug):
+    category = get_object_or_404(Categories, slug=category_slug)
+    posts = People.published.filter(category_id=category.pk)
     context = {
-        "title": "Отображние по категориям",
+        "title": f"Рубрика: {category.name}",
         "menu": menu,
-        "posts": data_db,
-        "category_selected": category_id,
+        "posts": posts,
+        "category_selected": category.pk,
     }
 
     return render(request, "people/index.html", context)
