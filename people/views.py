@@ -43,18 +43,19 @@ categories_db = [
 
 
 def index(request):
+    posts = People.published.all()
     context = {
         "menu": menu,
         "title": "Главная страница",
-        "posts": data_db,
+        "posts": posts,
         "url_name": url_name,
         "category_selected": 0,
     }
     return render(request, "people/index.html", context)
 
 
-def show_post(request, post_id):
-    post = get_object_or_404(People, pk=post_id)
+def show_post(request, post_slug):
+    post = get_object_or_404(People, slug=post_slug)
 
     context = {"title": post.title, "menu": menu, "post": post, "category_selected": 1}
     return render(request, "people/post.html", context)
