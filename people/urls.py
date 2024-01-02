@@ -1,6 +1,6 @@
 from django.urls import path, register_converter
 
-from people.views import index, about, show_post, add_page, contact, login, show_category
+from people.views import index, about, show_post, add_page, contact, login, show_category, show_tag_post_list
 from people.converters import FoundDigitsYearConverter
 
 
@@ -16,5 +16,6 @@ urlpatterns = [
     path('addpage/', add_page, name='add_page'),
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
-    path('category/<slug:category_slug>/', show_category, name='category')
+    path('category/<slug:category_slug>/', show_category, name='category'),
+    path('tag/<slug:tag_slug>/', show_tag_post_list, name='tag')
 ]

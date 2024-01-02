@@ -19,6 +19,7 @@ class People(models.Model):
     time_update = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(choices=Status.choices, default=Status.DRAFT)
     category = models.ForeignKey('Categories', on_delete=models.PROTECT, related_name='posts')
+    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags')
 
     objects = models.Manager()
     published = PublishedManager()
@@ -37,3 +38,12 @@ class Categories(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class TagPost(models.Model):
+    tag = models.CharField(max_length=100, db_index=True)
+    slug = models.SlugField(max_length=255, db_index=True, unique=True)
+
+    def  __str__(self) -> str:
+        return self.tag
+    

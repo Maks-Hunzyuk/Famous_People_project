@@ -1,5 +1,19 @@
 {% extends "people/base.html" %}
 
+{% block breadcrumbs %}
+    {% comment "" %}Теги{% endcomment %}
+    {% with post.tags.all as tags %}
+        {% if tags %}
+            <ul class="tags-list">
+                <li>Теги:</li>
+                {% for tag in tags %}
+                    <li><a href="{% url "people:tag" tag.slug %}">{{ tag.tag }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+{% endblock breadcrumbs %}
+
 {% block content %}
     <h1>{{ post.title }}</h1>
 
