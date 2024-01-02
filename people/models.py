@@ -10,7 +10,7 @@ class PublishedManager(models.Manager):
 class People(models.Model):
     class Status(models.IntegerChoices):
         DRAFT = (0, "Черновик")
-        PUBLISHED = (1, "Опусбликовано")
+        PUBLISHED = (1, "Опубликовано")
 
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, db_index=True)
@@ -20,6 +20,7 @@ class People(models.Model):
     is_published = models.BooleanField(choices=Status.choices, default=Status.DRAFT)
     category = models.ForeignKey('Categories', on_delete=models.PROTECT, related_name='posts')
     tags = models.ManyToManyField('TagPost', blank=True, related_name='tags')
+    partner = models.OneToOneField('Partner', on_delete=models.SET_NULL, null=True, blank=True, related_name='partner')
 
     objects = models.Manager()
     published = PublishedManager()
@@ -46,4 +47,11 @@ class TagPost(models.Model):
 
     def  __str__(self) -> str:
         return self.tag
-    
+
+
+class Partner(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField(null=True)
+
+    def __str__(self) -> str:
+        return self.name
