@@ -10,7 +10,6 @@ menu = [
     "Обратная связь",
     "Войти",
 ]
-url_name = ["about", "add_page", "contact", "login"]
 
 
 def index(request):
@@ -19,7 +18,6 @@ def index(request):
         "menu": menu,
         "title": "Главная страница",
         "posts": posts,
-        "url_name": url_name,
         "category_selected": 0,
     }
     return render(request, "people/index.html", context)
