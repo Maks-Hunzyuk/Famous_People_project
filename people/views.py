@@ -2,6 +2,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
 from people.models import People, Categories, TagPost
+from people.forms import AddPostForm
 
 
 menu = [
@@ -44,7 +45,18 @@ def show_category(request, category_slug):
 
 
 def add_page(request):
-    return HttpResponse("Добавление статьи")
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+            print(form.changed_data)
+    else:
+        form = AddPostForm()
+    context = {
+        'menu': menu,
+        'title': 'Добавление статью',
+        'form': form
+    }
+    return render(request, 'people/addpage.html', context)
 
 
 def contact(request):
