@@ -2,7 +2,7 @@ from typing import Any
 from django.contrib import admin, messages
 from django.db.models.query import QuerySet
 
-from people.models import People, Categories, TagPost, Partner
+from .models import People, Categories, TagPost, Partner
 
 
 admin.site.register(TagPost)
@@ -25,6 +25,9 @@ class MarriedFilter(admin.SimpleListFilter):
 
 @admin.register(People)
 class PeopleAdmin(admin.ModelAdmin):
+    fields = ('title', 'slug', 'content', 'category', 'partner', 'tags')
+    filter_horizontal = ('tags', )
+    prepopulated_fields = {'slug': ('title', )}
     list_display = (
         "id",
         "title",

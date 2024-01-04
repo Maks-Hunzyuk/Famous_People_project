@@ -17,8 +17,10 @@ class People(models.Model):
     content = models.TextField(blank=True)
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(choices=tuple(map(
-        lambda x: (bool(x[0]), x[1]), Status.choices)), default=Status.DRAFT)
+    is_published = models.BooleanField(
+        choices=tuple(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
+        default=Status.DRAFT,
+    )
     category = models.ForeignKey(
         "Categories", on_delete=models.PROTECT, related_name="posts"
     )
@@ -36,6 +38,7 @@ class People(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
 
     class Meta:
         verbose_name = "Известные люди"
