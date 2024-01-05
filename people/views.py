@@ -1,8 +1,8 @@
 from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 
-from people.models import People, Categories, TagPost
-from people.forms import AddPostForm
+from .models import People, Categories, TagPost, UploadFile
+from .forms import AddPostForm, UploadFileForm
 
 
 menu = [
@@ -14,7 +14,7 @@ menu = [
 
 
 def index(request):
-    posts = People.published.all().select_related('category')
+    posts = People.published.all().select_related("category")
     context = {
         "menu": menu,
         "title": "Главная страница",
@@ -33,7 +33,7 @@ def show_post(request, post_slug):
 
 def show_category(request, category_slug):
     category = get_object_or_404(Categories, slug=category_slug)
-    posts = People.published.filter(category_id=category.pk).select_related('category')
+    posts = People.published.filter(category_id=category.pk).select_related("category")
     context = {
         "title": f"Рубрика: {category.name}",
         "menu": menu,
@@ -45,22 +45,15 @@ def show_category(request, category_slug):
 
 
 def add_page(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST)
+    if request.method == "POST":
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
-            try:
-                People.objects.create(**form.changed_data)
-                return redirect('people:home')
-            except ValueError:
-                form.add_error(None, 'Ошибка добавления поста')
+            form.save()
+            return redirect("people:home")
     else:
         form = AddPostForm()
-    context = {
-        'menu': menu,
-        'title': 'Добавление статьи',
-        'form': form
-    }
-    return render(request, 'people/addpage.html', context)
+    context = {"menu": menu, "title": "Добавление статьи", "form": form}
+    return render(request, "people/addpage.html", context)
 
 
 def contact(request):
@@ -76,19 +69,27 @@ def page_not_found(request, exception):
 
 
 def about(request):
-    context = {"title": "О сайте"}
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = UploadFile(file=form.changed_data['file_upload'])
+            item.save()
+    else:
+        form = UploadFileForm()
+    context = {"title": "О сайте", "form": form}
     return render(request, "people/about.html", context)
 
 
-def  show_tag_post_list(request, tag_slug):
+def show_tag_post_list(request, tag_slug):
     tag = get_object_or_404(TagPost, slug=tag_slug)
-    posts = tag.tags.filter(is_published=People.Status.PUBLISHED).select_related('category')
+    posts = tag.tags.filter(is_published=People.Status.PUBLISHED).select_related(
+        "category"
+    )
 
     context = {
-        'title': f"Тег: #{tag.tag}",
-        'menu': menu,
-        'posts': posts,
-        'category_selected': None
+        "title": f"Тег: #{tag.tag}",
+        "menu": menu,
+        "posts": posts,
+        "category_selected": None,
     }
-    return render(request, 'people/index.html', context)
- 
+    return render(request, "people/index.html", context)

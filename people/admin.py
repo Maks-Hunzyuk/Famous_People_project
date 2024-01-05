@@ -1,6 +1,7 @@
 from typing import Any
 from django.contrib import admin, messages
 from django.db.models.query import QuerySet
+from django.utils.safestring import mark_safe
 
 from .models import People, Categories, TagPost, Partner
 
@@ -19,22 +20,22 @@ class MarriedFilter(admin.SimpleListFilter):
     def queryset(self, request: Any, queryset: QuerySet[Any]) -> QuerySet[Any] | None:
         if self.value() == "married":
             return queryset.filter(partner__isnull=False)
-        elif self.value() == 'single':
+        elif self.value() == "single":
             return queryset.filter(partner__isnull=True)
 
 
 @admin.register(People)
 class PeopleAdmin(admin.ModelAdmin):
-    fields = ('title', 'slug', 'content', 'category', 'partner', 'tags')
-    filter_horizontal = ('tags', )
-    prepopulated_fields = {'slug': ('title', )}
+    fields = ("title", "slug", "photo", "content", "category", "partner", "tags")
+    filter_horizontal = ("tags",)
+    prepopulated_fields = {"slug": ("title",)}
     list_display = (
         "id",
         "title",
+        "post_photo",
         "time_create",
         "is_published",
         "category",
-        "brief_info",
     )
     list_display_links = ("id", "title")
     ordering = ("time_create", "title")
@@ -45,8 +46,10 @@ class PeopleAdmin(admin.ModelAdmin):
     actions = ("set_published", "set_draft")
 
     @admin.display(description="Карткое описание", ordering="content")
-    def brief_info(self, human: People):
-        return f"Описание {len(human.content)} символов."
+    def post_photo(self, people: People):
+        if people.photo:
+            return mark_safe(f"<img src='{people.photo.url}' width=50>")
+        return "Без фото"
 
     @admin.action(description="Опубликовать выбранные записи")
     def set_published(self, request, queryset):

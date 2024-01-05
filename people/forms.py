@@ -1,9 +1,8 @@
 from typing import Any
 from django import forms
-from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.utils.deconstruct import deconstructible
 
-from people.models import Partner, Categories
+from people.models import Partner, Categories, People
 
 
 @deconstructible
@@ -25,31 +24,7 @@ class RussianValidator:
             raise forms.ValidationError(self.message, code=self.code)
 
 
-class AddPostForm(forms.Form):
-    title = forms.CharField(
-        max_length=255,
-        min_length=5,
-        label="Заголовок",
-        widget=forms.TextInput(attrs={"class": "form-input"}),
-        error_messages={
-            "min_length": "Слишком короткое название статьи",
-            "requered": "Это поле обязательно",
-        },
-    )
-    slug = forms.SlugField(
-        max_length=255,
-        label="URL",
-        validators=[
-            MinLengthValidator(5, message="Минимум 5 символов"),
-            MaxLengthValidator(100, message="Максимум 5 символов"),
-        ],
-    )
-    content = forms.CharField(
-        widget=forms.Textarea(attrs={"cols": 50, "rows": 5}),
-        required=False,
-        label="Котнент",
-    )
-    is_published = forms.BooleanField(required=False, initial=True, label="Статус")
+class AddPostForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Categories.objects.all(),
         empty_label="Категория не выбрана",
@@ -61,10 +36,31 @@ class AddPostForm(forms.Form):
         label="Семейное положение",
     )
 
-    def clean_title(self) -> dict[str, Any]:
-        title = self.cleaned_data["title"]
-        allowed_chars = "ЙЦУКЕНГШЩЗХЪЭЖДЛОРПАВЫФЯЧСМИТЬБЮйцукенгшщзхъэждлорпавыыфячсмитьбю1234567890- "
-        if not set(title) <= set(allowed_chars):
-            raise forms.ValidationError(
-                "Должны присутствовать только русские символы, дефис и пробел"
-            )
+    class Meta:
+        model = People
+        fields = (
+            "title",
+            "slug",
+            "content",
+            'photo',
+            "is_published",
+            "category",
+            "partner",
+            "tags",
+        )
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-input"}),
+            "content": forms.Textarea(attrs={"cols": 50, "rows": 5}),
+        }
+        labels = {"slug": "URL"}
+
+        def clean_title(self):
+            title = self.cleaned_data["title"]
+            print(type(len(title)))
+            if len(title) > 50:
+                raise forms.ValidationError("Длинна превышает 50 символов")
+            return title
+
+
+class UploadFileForm(forms.Form):
+    file = forms.ImageField(label="Фаил")

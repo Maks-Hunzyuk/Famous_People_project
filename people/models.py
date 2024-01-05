@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models.query import QuerySet
-from django.core.validators import MinLengthValidator, MaxValueValidator
 
 
 class PublishedManager(models.Manager):
@@ -19,11 +18,14 @@ class People(models.Model):
         unique=True,
         db_index=True,
         verbose_name="Slug",
-        validators=[
-            MinLengthValidator(5, message="Минимум 5 символов"),
-            MaxValueValidator(100, message="Максимум 100 символов"),
-        ],
     )
+    photo = models.ImageField(
+        upload_to='photos/%Y/%m/%d/',
+        default=None,
+        blank=True,
+        null=True,
+        verbose_name='Фото',
+                              )
     content = models.TextField(blank=True)
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
@@ -82,3 +84,7 @@ class Partner(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class UploadFile(models.Model):
+    file = models.FileField(upload_to="uploads_model")

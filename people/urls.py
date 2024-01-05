@@ -1,7 +1,7 @@
 from django.urls import path, register_converter
 
-from people.views import index, about, show_post, add_page, contact, login, show_category, show_tag_post_list
-from people.converters import FoundDigitsYearConverter
+from .views import index, about, show_post, add_page, contact, login, show_category, show_tag_post_list
+from .converters import FoundDigitsYearConverter
 
 
 app_name = 'people'
