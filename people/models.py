@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.query import QuerySet
+from django.core.validators import MinLengthValidator, MaxValueValidator
 
 
 class PublishedManager(models.Manager):
@@ -13,7 +14,16 @@ class People(models.Model):
         PUBLISHED = (1, "Опубликовано")
 
     title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True, db_index=True)
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        db_index=True,
+        verbose_name="Slug",
+        validators=[
+            MinLengthValidator(5, message="Минимум 5 символов"),
+            MaxValueValidator(100, message="Максимум 100 символов"),
+        ],
+    )
     content = models.TextField(blank=True)
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
@@ -38,7 +48,6 @@ class People(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
 
     class Meta:
         verbose_name = "Известные люди"

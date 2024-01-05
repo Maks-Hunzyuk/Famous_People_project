@@ -1,5 +1,5 @@
 from django.http import HttpResponseNotFound, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 
 from people.models import People, Categories, TagPost
 from people.forms import AddPostForm
@@ -48,12 +48,16 @@ def add_page(request):
     if request.method == 'POST':
         form = AddPostForm(request.POST)
         if form.is_valid():
-            print(form.changed_data)
+            try:
+                People.objects.create(**form.changed_data)
+                return redirect('people:home')
+            except ValueError:
+                form.add_error(None, 'Ошибка добавления поста')
     else:
         form = AddPostForm()
     context = {
         'menu': menu,
-        'title': 'Добавление статью',
+        'title': 'Добавление статьи',
         'form': form
     }
     return render(request, 'people/addpage.html', context)
