@@ -1,8 +1,9 @@
 from django.urls import path, register_converter
 
-from .views import IndexTemplateView, about, ShowPostView, AddPageView, contact, login, PeopleCategoryView, TagPostListView
 from .converters import FoundDigitsYearConverter
-
+from .views import (AddPageView, IndexTemplateView, PeopleCategoryView,
+                    ShowPostView, TagPostListView, UpdatePageView, about,
+                    contact, login)
 
 app_name = 'people'
 
@@ -17,5 +18,6 @@ urlpatterns = [
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
     path('category/<slug:category_slug>/', PeopleCategoryView.as_view(), name='category'),
-    path('tag/<slug:tag_slug>/', TagPostListView.as_view(), name='tag')
+    path('tag/<slug:tag_slug>/', TagPostListView.as_view(), name='tag'),
+    path('edit/<int:pk>/', UpdatePageView.as_view(), name='edit_page')
 ]

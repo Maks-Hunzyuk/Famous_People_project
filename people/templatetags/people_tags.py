@@ -3,7 +3,6 @@ from django.db.models import Count
 
 from people.models import Categories, TagPost
 
-
 register = template.Library()
 
 

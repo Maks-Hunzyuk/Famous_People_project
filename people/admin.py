@@ -1,10 +1,10 @@
 from typing import Any
+
 from django.contrib import admin, messages
 from django.db.models.query import QuerySet
 from django.utils.safestring import mark_safe
 
-from .models import People, Categories, TagPost, Partner
-
+from .models import Categories, Partner, People, TagPost
 
 admin.site.register(TagPost)
 admin.site.register(Partner)

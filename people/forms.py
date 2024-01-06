@@ -1,8 +1,9 @@
 from typing import Any
+
 from django import forms
 from django.utils.deconstruct import deconstructible
 
-from people.models import Partner, Categories, People
+from people.models import Categories, Partner, People
 
 
 @deconstructible

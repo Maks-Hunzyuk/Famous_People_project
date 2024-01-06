@@ -1,20 +1,15 @@
 from typing import Any
+
 from django.db.models.query import QuerySet
-from django.http import HttpResponseNotFound, HttpResponse
-from django.shortcuts import redirect, render, get_object_or_404
-from django.views import View
-from django.views.generic import DetailView, ListView
+from django.http import HttpResponse, HttpResponseNotFound
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
+from django.views.generic import (CreateView, DetailView, ListView,
+                                  UpdateView)
 
-from .models import People, TagPost, UploadFile
 from .forms import AddPostForm, UploadFileForm
-
-
-menu = [
-    "О сайте",
-    "Добавить статью",
-    "Обратная связь",
-    "Войти",
-]
+from .models import People, TagPost, UploadFile
+from .utils import DataMixin
 
 
 def contact(request):
@@ -41,35 +36,31 @@ def about(request):
     return render(request, "people/about.html", context)
 
 
-class AddPageView(View):
-    def get(self, request):
-        form = AddPostForm()
-        context = {
-            "menu": menu,
-            "title": "Добавление статьи",
-            "form": form,
-        }
-
-        return render(request, "people/addpage.html", context)
-
-    def post(self, request):
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect("people:home")
-        context = {"menu": menu, "title": "Добавление статьи", "form": form}
-        return render(request, "people/addpage.html", context)
+class AddPageView(DataMixin, CreateView):
+    form_class = AddPostForm
+    template_name = "people/addpage.html"
+    success_url = reverse_lazy("people:home")
+    title_page = 'Добавление статьи'
 
 
-class IndexTemplateView(ListView):
+class UpdatePageView(DataMixin, UpdateView):
+    model = People
+    fields = ('title', 'content', 'photo', 'is_published', 'category')
+    success_url = reverse_lazy('people:home')
+    title_page = 'Редактирование статьи'
+
+
+class IndexTemplateView(DataMixin, ListView):
     # model = People
     template_name = "people/index.html"
+    title_page = 'Главная страница'
+    category_selected = 0
 
     def get_queryset(self) -> QuerySet[Any]:
         return People.published.all().select_related("category")
 
 
-class PeopleCategoryView(ListView):
+class PeopleCategoryView(DataMixin, ListView):
     template_name = "people/index.html"
     context_object_name = "posts"
     allow_empty = False
@@ -82,13 +73,12 @@ class PeopleCategoryView(ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         item = context["posts"][0].category
-        context["title"] = "Категория - " + item.name
-        context["menu"] = menu
-        context["category_selected"] = item.pk
-        return context
+        return self.get_mixin_context(context,
+                                      title='Категория - ' + item.name,
+                                      category_selected=item.pk)
 
 
-class TagPostListView(ListView):
+class TagPostListView(DataMixin, ListView):
     template_name = "people/index.html"
     context_object_name = "posts"
     allow_empty = False
@@ -96,10 +86,7 @@ class TagPostListView(ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         tag = TagPost.objects.get(slug=self.kwargs["tag_slug"])
-        context["title"] = "Тег:" + tag.tag
-        context["menu"] = menu
-        context["category_selected"] = None
-        return context
+        return self.get_mixin_context(context, title='Тег:'+tag.tag)
 
     def get_queryset(self) -> QuerySet[Any]:
         return People.published.filter(
@@ -107,7 +94,7 @@ class TagPostListView(ListView):
         ).select_related("category")
 
 
-class ShowPostView(DetailView):
+class ShowPostView(DataMixin, DetailView):
     model = People
     template_name = "people/post.html"
     slug_url_kwarg = "post_slug"
@@ -115,9 +102,7 @@ class ShowPostView(DetailView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["title"] = context["post"].title
-        context["menu"] = menu
-        return context
+        return self.get_mixin_context(context, title=context['post'].title)
 
     def get_object(self, queryset: QuerySet[Any] | None = ...):
         return get_object_or_404(
