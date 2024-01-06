@@ -1,4 +1,5 @@
 from typing import Any
+from django.core.paginator import Paginator
 
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseNotFound
@@ -7,8 +8,8 @@ from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DetailView, ListView,
                                   UpdateView)
 
-from .forms import AddPostForm, UploadFileForm
-from .models import People, TagPost, UploadFile
+from .forms import AddPostForm
+from .models import People, TagPost
 from .utils import DataMixin
 
 
@@ -25,14 +26,11 @@ def page_not_found(request, exception):
 
 
 def about(request):
-    if request.method == "POST":
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            item = UploadFile(file=form.changed_data["file_upload"])
-            item.save()
-    else:
-        form = UploadFileForm()
-    context = {"title": "О сайте", "form": form}
+    contact_list = People.published.all()
+    paginator = Paginator(contact_list, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {"title": "О сайте", "page_obj": page_obj}
     return render(request, "people/about.html", context)
 
 
@@ -51,7 +49,6 @@ class UpdatePageView(DataMixin, UpdateView):
 
 
 class IndexTemplateView(DataMixin, ListView):
-    # model = People
     template_name = "people/index.html"
     title_page = 'Главная страница'
     category_selected = 0

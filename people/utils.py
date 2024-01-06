@@ -10,6 +10,7 @@ class DataMixin:
     title_page = None
     category_selected = None
     extra_context = {}
+    paginate_by = 5
 
     def __init__(self) -> None:
         if self.title_page:
