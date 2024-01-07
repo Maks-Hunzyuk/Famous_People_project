@@ -1,12 +1,11 @@
 from typing import Any
-from django.core.paginator import Paginator
 
+from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic import (CreateView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import AddPostForm
 from .models import People, TagPost
