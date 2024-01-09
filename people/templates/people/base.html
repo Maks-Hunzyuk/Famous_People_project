@@ -23,7 +23,7 @@
 				<li><a href="{% url 'people:add_page' %}">Добавить статью</a></li>
 				<li><a href="{% url 'people:contact' %}">Обратная связь</a></li>
 				{% if user.is_authenticated %}
-					<li class='last'>{{user.username}} | <a href="{% url 'users:logout' %}">Выйти</a></li>
+					<li class='last'><a href="{% url 'users:profile' %}">{{user.username}}</a> | <a href="{% url 'users:logout' %}">Выйти</a></li>
 				{% else %}
 					<li class="last"><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}">Регистрация</a></li>
 				{% endif %}	
