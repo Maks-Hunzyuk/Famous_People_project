@@ -2,6 +2,7 @@ from typing import Any
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import PasswordChangeView
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.views.generic.edit import UpdateView
@@ -9,7 +10,7 @@ from django.views.generic import CreateView
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 
-from users.forms import LoginUserForm, RegisterUserForm, UserProfileForm
+from users.forms import LoginUserForm, RegisterUserForm, UserProfileForm, UserPasswordChangeForm
 
 
 class UserLoginView(LoginView):
@@ -36,6 +37,13 @@ class ProfileUserView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
         return self.request.user
+
+
+class UserPasswordChangeView(PasswordChangeView):
+    form_class = UserPasswordChangeForm
+    success_url = reverse_lazy("users:password_change_done")
+    template_name = 'users/password_change_form.html'
+
 
 
 def logout_view(request):
