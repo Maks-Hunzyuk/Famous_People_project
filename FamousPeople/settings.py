@@ -144,6 +144,8 @@ AUTHENTICATION_BACKENDS = [
     'users.authentication.EmailAuthBackend'
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
 # send mail
 
 EMAIL_HOST = 'smtp.yandex.com'
@@ -156,3 +158,5 @@ EMAIL_BACKEND = "django.core.mail.console.EmailBackend"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+DEFAULT_USER_IMAGE = MEDIA_URL + 'users/default.png'
