@@ -2,7 +2,7 @@ from typing import Any
 
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.http import HttpResponse, HttpResponseNotFound
@@ -33,22 +33,24 @@ def about(request):
     return render(request, "people/about.html", context)
 
 
-class AddPageView(LoginRequiredMixin, DataMixin, CreateView):
+class AddPageView(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = "people/addpage.html"
     success_url = reverse_lazy("people:home")
     title_page = 'Добавление статьи'
+    permission_required ="people.add_people"
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         w = form.save(commit=False)
         w.author = self.request.user
         return super().form_valid(form)
 
-class UpdatePageView(DataMixin, UpdateView):
+class UpdatePageView(PermissionRequiredMixin, DataMixin, UpdateView):
     model = People
     fields = ('title', 'content', 'photo', 'is_published', 'category')
     success_url = reverse_lazy('people:home')
     title_page = 'Редактирование статьи'
+    permission_required = "people.change_people"
 
 
 class IndexTemplateView(DataMixin, ListView):

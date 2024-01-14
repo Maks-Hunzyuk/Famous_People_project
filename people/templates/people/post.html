@@ -1,7 +1,9 @@
 {% extends "people/base.html" %}
 
 {% block breadcrumbs %}
-    {% comment "" %}Теги{% endcomment %}
+    {% if perms.people.change_people %}
+        <p><a href="{% url 'edit_page' post.slug %}">Редактировать</a></p>
+    {% endif %}
     {% with post.tags.all as tags %}
         {% if tags %}
             <ul class="tags-list">
